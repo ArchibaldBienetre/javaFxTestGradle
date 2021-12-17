@@ -12,6 +12,11 @@ repositories {
     mavenCentral()
 }
 
+var integrationTest = sourceSets.create("integrationTest")
+configurations[integrationTest.implementationConfigurationName].extendsFrom(configurations.testImplementation.get())
+configurations[integrationTest.runtimeOnlyConfigurationName].extendsFrom(configurations.testRuntimeOnly.get())
+
+
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -42,6 +47,8 @@ dependencies {
     testImplementation("org.testfx:testfx-junit5:${testFxVersion}")
     testImplementation("org.assertj:assertj-core:3.21.0")
     testImplementation("org.hamcrest:hamcrest-core:2.2")
+
+    "integrationTestImplementation"(project)
 }
 
 tasks.test {

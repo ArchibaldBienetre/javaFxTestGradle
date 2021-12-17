@@ -3,6 +3,6 @@ module com.example.javafxtest {
     requires javafx.controls;
     requires javafx.fxml;
 
-    opens com.example.javafxtest to javafx.fxml;
+    opens com.example.javafxtest;
     exports com.example.javafxtest;
 }
