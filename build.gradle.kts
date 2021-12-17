@@ -36,6 +36,12 @@ dependencies {
     var junitVersion = "5.8.2"
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
+    var testFxVersion = "4.0.16-alpha"
+    testImplementation("org.testfx:testfx-core:${testFxVersion}")
+    testImplementation("org.testfx:testfx-junit5:${testFxVersion}")
+    testImplementation("org.assertj:assertj-core:3.21.0")
+    testImplementation("org.hamcrest:hamcrest-core:2.2")
 }
 
 tasks.test {
