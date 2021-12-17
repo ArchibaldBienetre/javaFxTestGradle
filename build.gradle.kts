@@ -1,7 +1,6 @@
 plugins {
     id("java")
     id("application")
-    id("org.jetbrains.kotlin.jvm") version "1.5.31"
     id("org.openjfx.javafxplugin") version "0.0.10"
     id("org.beryx.jlink") version "2.24.1"
 }
@@ -30,9 +29,9 @@ javafx {
 
 dependencies {
     var javaFxVersion = "11.0.2"
-    implementation("org.openjfx:javafx-graphics:${javaFxVersion}:win")
     implementation("org.openjfx:javafx-graphics:${javaFxVersion}:linux")
-    implementation("org.openjfx:javafx-graphics:${javaFxVersion}:mac")
+//    implementation("org.openjfx:javafx-graphics:${javaFxVersion}:win")
+//    implementation("org.openjfx:javafx-graphics:${javaFxVersion}:mac")
 
     var junitVersion = "5.8.2"
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
