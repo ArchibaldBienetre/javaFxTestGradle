@@ -1,11 +1,21 @@
 version: 2.1
 
+commands:
+  install_needed_packages:
+    steps:
+      - run: |
+          sudo apt-get update
+          # contains the pango font. Without it, there is this error: 
+          # "java.util.concurrent.ExecutionException: java.lang.UnsatisfiedLinkError: no javafx_font_pango in java.library.path"
+          sudo apt-get install libpangoft2-1.0-0
+
 jobs:
   run_tests_java:
     docker:
       - image: cimg/openjdk:11.0.13
     steps:
       - checkout
+      - install_needed_packages
       - run: |
           ./gradlew clean check --info
       - store_test_results:
