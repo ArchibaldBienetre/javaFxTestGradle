@@ -12,24 +12,29 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 
-//import static org.testfx.assertions.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.testfx.assertions.api.Assertions.assertThat;
 
 @ExtendWith(ApplicationExtension.class)
 public class HelloApplicationTest {
 
     // headless testing: no UI will pop up, this should work on CI
     @BeforeAll
-    public static void setupForHeadlessTesting() throws Exception {
-        System.setProperty("monocle.platform", "Headless");
-        System.setProperty("testfx.robot", "glass");
-        System.setProperty("glass.platform", "Monocle");
-        System.setProperty("embedded", "monocle");
-        System.setProperty("testfx.headless", "true");
-        System.setProperty("prism.order", "sw");
-        // System.setProperty("prism.text", "t2k");
-        System.setProperty("prism.text", "native");
-        System.setProperty("java.awt.headless", "true");
+    public static void setupForHeadlessTesting() {
+        // https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
+        String isRunningOnCi = System.getProperty("CI");
+        if ("true".equalsIgnoreCase(isRunningOnCi)) {
+            System.setProperty("monocle.platform", "Headless");
+            System.setProperty("testfx.robot", "glass");
+            System.setProperty("glass.platform", "Monocle");
+            System.setProperty("embedded", "monocle");
+            System.setProperty("testfx.headless", "true");
+            System.setProperty("prism.order", "sw");
+
+            // System.setProperty("prism.text", "t2k");
+            System.setProperty("prism.text", "native");
+
+            System.setProperty("java.awt.headless", "true");
+        }
     }
 
     @BeforeEach
