@@ -55,14 +55,10 @@ javafx {
 }
 
 dependencies {
-    implementation("org.openjfx:javafx-base:${javaFxVersion}:linux")
-    implementation("org.openjfx:javafx-controls:${javaFxVersion}:linux")
-    implementation("org.openjfx:javafx-fxml:${javaFxVersion}:linux")
-
-//    implementation("org.openjfx:javafx-graphics:${javaFxVersion}")
-    implementation("org.openjfx:javafx-graphics:${javaFxVersion}:linux")
-//    implementation("org.openjfx:javafx-graphics:${javaFxVersion}:win")
-//    implementation("org.openjfx:javafx-graphics:${javaFxVersion}:mac")
+    implementation("org.openjfx:javafx-base:${javaFxVersion}")
+    implementation("org.openjfx:javafx-controls:${javaFxVersion}")
+    implementation("org.openjfx:javafx-fxml:${javaFxVersion}")
+    implementation("org.openjfx:javafx-graphics:${javaFxVersion}")
 
     var junitVersion = "5.8.2"
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
