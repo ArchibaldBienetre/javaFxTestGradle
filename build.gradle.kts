@@ -50,7 +50,8 @@ java {
 
 application {
     mainModule.set("com.example.javafxtest")
-    mainClass.set("com.example.javafxtest.HelloApplication")
+    // mainClass.set("com.example.javafxtest.HelloApplication")
+    mainClass.set("com.example.javafxtest.FileChooserApplication")
 }
 
 val javaFxVersion = "18-ea+8"
@@ -64,6 +65,12 @@ dependencies {
     implementation("org.openjfx:javafx-controls:${javaFxVersion}")
     implementation("org.openjfx:javafx-fxml:${javaFxVersion}")
     implementation("org.openjfx:javafx-graphics:${javaFxVersion}")
+
+    // for @Nullable etc
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
+
+    // for @VisibleForTesting etc
+    implementation("com.google.guava:guava:31.0.1-jre")
 
     var junitVersion = "5.8.2"
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
