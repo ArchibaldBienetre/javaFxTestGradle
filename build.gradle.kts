@@ -12,6 +12,7 @@ repositories {
     mavenCentral()
 }
 
+// separate integration testing module - cf https://docs.gradle.org/current/samples/sample_java_modules_multi_project.html
 var integrationTest = sourceSets.create("integrationTest")
 configurations[integrationTest.implementationConfigurationName].extendsFrom(configurations.testImplementation.get())
 configurations[integrationTest.runtimeOnlyConfigurationName].extendsFrom(configurations.testRuntimeOnly.get())
@@ -25,7 +26,11 @@ val integrationTestTask = tasks.register<Test>("integrationTest") {
     description = "Runs integration tests."
     group = "verification"
     useJUnitPlatform()
-    jvmArgs = listOf("--add-exports", "javafx.graphics/com.sun.javafx.application=org.testfx")
+    jvmArgs = listOf("--add-exports", "javafx.graphics/com.sun.javafx.application=org.testfx",
+            "--add-exports", "javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
+            "--add-opens", "javafx.graphics/com.sun.glass.ui=org.testfx",
+            "--add-exports", "javafx.graphics/com.sun.glass.ui=org.testfx.monocle"
+    )
 
     testClassesDirs = integrationTest.output.classesDirs
     // Make sure we run the 'Jar' containing the tests (and not just the 'classes' folder) so that test resources are also part of the test module
@@ -70,6 +75,9 @@ dependencies {
     var testFxVersion = "4.0.16-alpha"
     testImplementation("org.testfx:testfx-core:${testFxVersion}")
     testImplementation("org.testfx:testfx-junit5:${testFxVersion}")
+    // headless tests: no UI required
+    testImplementation("org.testfx:openjfx-monocle:jdk-12.0.1+2")
+
     testImplementation("org.assertj:assertj-core:3.21.0")
     testImplementation("org.hamcrest:hamcrest-core:2.2")
 
