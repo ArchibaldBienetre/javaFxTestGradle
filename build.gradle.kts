@@ -16,6 +16,27 @@ var integrationTest = sourceSets.create("integrationTest")
 configurations[integrationTest.implementationConfigurationName].extendsFrom(configurations.testImplementation.get())
 configurations[integrationTest.runtimeOnlyConfigurationName].extendsFrom(configurations.testRuntimeOnly.get())
 
+val integrationTestJarTask = tasks.register<Jar>(integrationTest.jarTaskName) {
+    archiveClassifier.set("integration-tests")
+    from(integrationTest.output)
+}
+
+val integrationTestTask = tasks.register<Test>("integrationTest") {
+    description = "Runs integration tests."
+    group = "verification"
+    useJUnitPlatform()
+    jvmArgs = listOf("--add-exports", "javafx.graphics/com.sun.javafx.application=org.testfx")
+
+    testClassesDirs = integrationTest.output.classesDirs
+    // Make sure we run the 'Jar' containing the tests (and not just the 'classes' folder) so that test resources are also part of the test module
+    classpath = configurations[integrationTest.runtimeClasspathConfigurationName] + files(integrationTestJarTask)
+
+    shouldRunAfter(tasks.test)
+}
+
+tasks.check {
+    dependsOn(integrationTestTask)
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
