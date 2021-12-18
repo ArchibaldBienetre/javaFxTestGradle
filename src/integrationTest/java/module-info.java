@@ -4,7 +4,6 @@ module com.example.javafxtest.integrationtest {
     requires javafx.fxml;
 
     requires com.google.common;
-//    requires jsr305;
 
     requires org.junit.jupiter.api;
     requires org.testfx.junit5;

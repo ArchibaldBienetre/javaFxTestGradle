@@ -10,7 +10,7 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
-//import javax.annotation.Nullable;
+import javax.annotation.Nullable;
 import java.io.File;
 
 public class FileChooserController {
@@ -43,7 +43,7 @@ public class FileChooserController {
     }
 
     @VisibleForTesting
-    void updateTexFile(/*@Nullable*/ File tempTexFile) {
+    void updateTexFile(@Nullable File tempTexFile) {
         if (tempTexFile != null) {
             texFile = tempTexFile;
             texFileLabel.setText(texFile.getAbsolutePath());
@@ -67,7 +67,7 @@ public class FileChooserController {
     }
 
     @VisibleForTesting
-    void updateCsvFile(/*@Nullable*/ File newCsvFile) {
+    void updateCsvFile(@Nullable File newCsvFile) {
         if (newCsvFile != null) {
             csvFile = newCsvFile;
             csvFileLabel.setText(csvFile.getAbsolutePath());
