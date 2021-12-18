@@ -48,13 +48,18 @@ application {
     mainClass.set("com.example.javafxtest.HelloApplication")
 }
 
+val javaFxVersion = "18-ea+8"
 javafx {
-    version = "11.0.2"
+    version = javaFxVersion
     modules("javafx.controls", "javafx.fxml")
 }
 
 dependencies {
-    var javaFxVersion = "11.0.2"
+    implementation("org.openjfx:javafx-base:${javaFxVersion}:linux")
+    implementation("org.openjfx:javafx-controls:${javaFxVersion}:linux")
+    implementation("org.openjfx:javafx-fxml:${javaFxVersion}:linux")
+
+//    implementation("org.openjfx:javafx-graphics:${javaFxVersion}")
     implementation("org.openjfx:javafx-graphics:${javaFxVersion}:linux")
 //    implementation("org.openjfx:javafx-graphics:${javaFxVersion}:win")
 //    implementation("org.openjfx:javafx-graphics:${javaFxVersion}:mac")
@@ -62,6 +67,9 @@ dependencies {
     var junitVersion = "5.8.2"
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    // module required by junit, it seems
+    testImplementation("org.apiguardian:apiguardian-api:1.0.0")
+
 
     var testFxVersion = "4.0.16-alpha"
     testImplementation("org.testfx:testfx-core:${testFxVersion}")
