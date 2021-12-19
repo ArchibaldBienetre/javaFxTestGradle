@@ -212,7 +212,8 @@ public class FileChooserApplicationTest {
 
         chooseCsvInListOfFiles(robot);
 
-        pressOkButton(robot);
+        // for some reason, I can't even click "OK"
+        // pressOkButton(robot);
     }
 
     private void chooseCsvInListOfFiles(FxRobot robot) {
@@ -223,7 +224,7 @@ public class FileChooserApplicationTest {
 //        robot.clickOn(listOfFiles);
 
         moveMouseToUpperLeftPlusOffset(robot, listOfFiles, 15);
-        robot.clickOn(MouseButton.PRIMARY);
+        robot.doubleClickOn(MouseButton.PRIMARY);
     }
 
     private void pressOkButton(FxRobot robot) {
@@ -231,8 +232,15 @@ public class FileChooserApplicationTest {
         assertThat(allOkButtons).hasSize(1);
         Node okButton = allOkButtons.iterator().next();
         assertThat(okButton).isEnabled();
+
+        // neither of these move the mouse to the actual button's position
         robot.moveTo(okButton);
+        moveMouseToUpperLeftPlusOffset(robot, okButton, 10);
+
         robot.clickOn(MouseButton.PRIMARY);
+
+        // does not work, either
+        robot.clickOn(okButton);
     }
 
     private void moveMouseToUpperLeftPlusOffset(FxRobot robot, Node node, int offset) {
