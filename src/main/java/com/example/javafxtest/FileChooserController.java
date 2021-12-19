@@ -8,7 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Window;
-import net.raumzeitfalle.fx.filechooser.FXFileChooserDialog;
+import net.raumzeitfalle.fx.filechooser.FXFileChooserStage;
 import net.raumzeitfalle.fx.filechooser.PathFilter;
 import net.raumzeitfalle.fx.filechooser.Skin;
 import net.raumzeitfalle.fx.filechooser.locations.Locations;
@@ -37,12 +37,12 @@ public class FileChooserController {
 
     @FXML
     public void onOpenTexButtonClick(ActionEvent ignored) {
-        FXFileChooserDialog texChooser = getTexChooser();
+        FXFileChooserStage texChooser = getTexChooser();
         Optional<Path> selectedFile = getSelectedFile(texChooser);
         updateTexFile(selectedFile);
     }
 
-    private FXFileChooserDialog getTexChooser() {
+    private FXFileChooserStage getTexChooser() {
         return getFileChooser("TeX file", "tex", "Pick a TeX file");
     }
 
@@ -57,20 +57,20 @@ public class FileChooserController {
 
     @FXML
     public void onOpenCsvButtonClick(ActionEvent ignored) {
-        FXFileChooserDialog csvChooser = getCsvChooser();
+        FXFileChooserStage csvChooser = getCsvChooser();
         Optional<Path> selectedFile = getSelectedFile(csvChooser);
         updateCsvFile(selectedFile);
     }
 
-    private FXFileChooserDialog getCsvChooser() {
+    private FXFileChooserStage getCsvChooser() {
         return getFileChooser("CSV file", "csv", "Pick a CSV file");
     }
 
-    private FXFileChooserDialog getFileChooser(String filterLabel, String fileExtension, String dialogTitle) {
+    private FXFileChooserStage getFileChooser(String filterLabel, String fileExtension, String dialogTitle) {
         PathFilter filter = PathFilter.forFileExtension(filterLabel, fileExtension);
-        FXFileChooserDialog chooser;
+        FXFileChooserStage chooser;
         try {
-            chooser = FXFileChooserDialog.create(Skin.DEFAULT, filter);
+            chooser = FXFileChooserStage.create(Skin.DEFAULT, filter);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -82,12 +82,12 @@ public class FileChooserController {
         return chooser;
     }
 
-    private Optional<Path> getSelectedFile(FXFileChooserDialog fileChooser) {
+    private Optional<Path> getSelectedFile(FXFileChooserStage fileChooser) {
         Optional<Path> selectedFile = fileChooser.showOpenDialog(getWindow());
         if (selectedFile.isEmpty()) {
             // workaround for bug https://github.com/Oliver-Loeffler/FXFileChooser/issues/44
             try {
-                Field modelField = FXFileChooserDialog.class.getDeclaredField("model");
+                Field modelField = FXFileChooserStage.class.getDeclaredField("model");
                 modelField.setAccessible(true);
                 Object model = modelField.get(fileChooser);
                 Method getSelectedFileMethod = model.getClass().getDeclaredMethod("getSelectedFile");
