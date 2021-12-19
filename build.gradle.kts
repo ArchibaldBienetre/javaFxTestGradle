@@ -29,7 +29,8 @@ val integrationTestTask = tasks.register<Test>("integrationTest") {
     jvmArgs = listOf("--add-exports", "javafx.graphics/com.sun.javafx.application=org.testfx",
             "--add-exports", "javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
             "--add-opens", "javafx.graphics/com.sun.glass.ui=org.testfx",
-            "--add-exports", "javafx.graphics/com.sun.glass.ui=org.testfx.monocle"
+            "--add-exports", "javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
+            "--add-reads", "com.example.javafxtest=ALL-UNNAMED"
     )
 
     testClassesDirs = integrationTest.output.classesDirs

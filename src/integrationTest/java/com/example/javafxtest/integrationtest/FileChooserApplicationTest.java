@@ -1,9 +1,15 @@
 package com.example.javafxtest.integrationtest;
 
+import com.example.javafxtest.FileChooserApplication;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.input.MouseButton;
+import javafx.stage.Window;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,19 +21,17 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.testfx.assertions.api.Assertions.assertThat;
 
-import com.example.javafxtest.FileChooserApplication;
-
-// https://github.com/Oliver-Loeffler/FXFileChooser/blob/master/src/test/java/net/raumzeitfalle/fx/filechooser/FileChooserControllerTest.java
-
 @ExtendWith(ApplicationExtension.class)
-public class FileChooserApplicationTest { // extends AbstractApplicationTest {
+public class FileChooserApplicationTest {
 
-    private static final String LAME_EXCUSE = "It seems file choosers are rooted in the concrete OS and can't be controlled nicely using TestFX. " +
-            "Let's trust the framework, and, in another test, inject member values so we can test other things.";
     private Button openCsvButton;
     private Label csvFileLabel;
     private Button openTexButton;
@@ -42,6 +46,26 @@ public class FileChooserApplicationTest { // extends AbstractApplicationTest {
     @BeforeEach
     public void setup() throws Exception {
         ApplicationTest.launch(FileChooserApplication.class);
+
+        putDummyFilesIntoUserHome();
+    }
+
+    // FXFileChooser always has the user's home as the very first pre-selected item in the search path.
+    // As I found it hard to select a different directory, I work around the issue nad put a file into the user home
+    private void putDummyFilesIntoUserHome() throws IOException {
+        Path userHome = Paths.get(System.getProperty("user.home"));
+
+        File dummyCsv = getDummyFileFromClasspath("dummyCsv.csv");
+        Path targetCsv = userHome.resolve("dummyCsv.csv");
+        if (! targetCsv.toFile().exists()) {
+            Files.copy(dummyCsv.toPath(), targetCsv);
+        }
+
+        File dummyTex = getDummyFileFromClasspath("dummyTex.tex");
+        Path targetTex = userHome.resolve("dummyTex.tex");
+        if (! targetTex.toFile().exists()) {
+            Files.copy(dummyTex.toPath(), targetTex);
+        }
     }
 
     /**
@@ -62,9 +86,7 @@ public class FileChooserApplicationTest { // extends AbstractApplicationTest {
 
 
     @Test
-    @Disabled(LAME_EXCUSE)
-    // see GtkCommonDialogs: private static native FileChooserResult _showFileChooser
-    void testFileSelection(FxRobot robot) {
+    void testFileSelection(FxRobot robot) throws InterruptedException {
         // arrange
         lookUpUiNodes(robot);
         File dummyCsv = getDummyFileFromClasspath("dummyCsv.csv");
@@ -72,6 +94,7 @@ public class FileChooserApplicationTest { // extends AbstractApplicationTest {
 
         // act
         robot.clickOn(openCsvButton);
+        selectFirstMatchingFileInUserHome(robot);
 
         // assert
         assertThat(openCsvButton).hasText("Pick a CSV file!");
@@ -162,6 +185,54 @@ public class FileChooserApplicationTest { // extends AbstractApplicationTest {
                 .describedAs("file not found in classpath: " + fileName)
                 .isNotNull();
         return new File(resource.getFile());
+    }
+
+    /**
+     * With a FXFileChooserDialog open, select a file.
+     * <p/>
+     * Although FXFileChooser is already much better than plain JavaFX, I still had to work a round a lot of issues.
+     * <p/>
+     * Find referenced UI elements in filechooser-0.0.6.jar!/net/raumzeitfalle/fx/filechooser/FileChooserView.fxml
+     */
+    private void selectFirstMatchingFileInUserHome(FxRobot robot) {
+        // cannot edit this directly, as it is bound
+//        TextField selectedFile = robot.lookup("#selectedFile").queryAs(TextField.class);
+//        selectedFile.setEditable(true);
+//        selectedFile.setText(dummyCsv.getAbsolutePath());
+
+        // cannot choose the test files directory
+        // I think I need to work around this... https://stackoverflow.com/a/40476164/1143126
+//        SplitMenuButton chooseDirectory = robot.lookup("#chooser").queryAs(SplitMenuButton.class);
+//        robot.clickOn(chooseDirectory);
+//        List<MenuItem> items = chooseDirectory.getItems();
+//        MenuItem lastItem = chooseDirectory.getItems().get(items.size() - 1);
+
+        chooseCsvInListOfFiles(robot);
+
+        pressOkButton(robot);
+    }
+
+    private void chooseCsvInListOfFiles(FxRobot robot) {
+        ListView<?> listOfFiles = robot.lookup("#listOfFiles").queryListView();
+        // I cannot do this programmatically, it seems
+//        listOfFiles.getSelectionModel().selectFirst();
+//        listOfFiles.refresh();
+//        robot.clickOn(listOfFiles);
+
+        Point2D fileListPoint = listOfFiles.localToScene(0, 0);
+        Scene scene = listOfFiles.getScene();
+        Window window = scene.getWindow();
+        robot.moveTo(new Point2D(
+                fileListPoint.getX() + scene.getX() + window.getX() + 15,
+                fileListPoint.getY() + scene.getY() + window.getY() + 15
+        ));
+        robot.clickOn(MouseButton.PRIMARY);
+    }
+
+    private void pressOkButton(FxRobot robot) {
+        Button okButton = robot.lookup("#okButton").queryButton();
+        assertThat(okButton).isEnabled();
+        robot.clickOn(okButton);
     }
 }
 
