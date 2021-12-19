@@ -15,8 +15,12 @@ import org.testfx.framework.junit5.ApplicationTest;
 import static org.testfx.assertions.api.Assertions.assertThat;
 
 @ExtendWith(ApplicationExtension.class)
-public class HelloApplicationTest extends AbstractApplicationTest {
+public class HelloApplicationTest {
 
+    @BeforeAll
+    public static void setupForHeadlessTesting() {
+        HeadlessHelper.setupForHeadlessTesting();
+    }
 
     @BeforeEach
     public void setup() throws Exception {

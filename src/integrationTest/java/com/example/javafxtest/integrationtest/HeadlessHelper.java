@@ -1,11 +1,8 @@
 package com.example.javafxtest.integrationtest;
 
-import org.junit.jupiter.api.BeforeAll;
-
-public class AbstractApplicationTest {
+public class HeadlessHelper {
 
     // headless testing: no UI will pop up, this should work on CI
-    @BeforeAll
     public static void setupForHeadlessTesting() {
         // https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
         String isRunningOnCi = System.getProperty("CI");

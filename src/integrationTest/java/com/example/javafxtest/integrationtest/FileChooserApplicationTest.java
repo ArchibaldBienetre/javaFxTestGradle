@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -20,18 +21,23 @@ import static org.testfx.assertions.api.Assertions.assertThat;
 
 import com.example.javafxtest.FileChooserApplication;
 
-//import javax.annotation.Nullable;
+// https://github.com/Oliver-Loeffler/FXFileChooser/blob/master/src/test/java/net/raumzeitfalle/fx/filechooser/FileChooserControllerTest.java
 
 @ExtendWith(ApplicationExtension.class)
-public class FileChooserApplicationTest extends AbstractApplicationTest {
+public class FileChooserApplicationTest { // extends AbstractApplicationTest {
 
-    public static final String LAME_EXCUSE = "It seems file choosers are rooted in the concrete OS and can't be controlled nicely using TestFX. " +
+    private static final String LAME_EXCUSE = "It seems file choosers are rooted in the concrete OS and can't be controlled nicely using TestFX. " +
             "Let's trust the framework, and, in another test, inject member values so we can test other things.";
     private Button openCsvButton;
     private Label csvFileLabel;
     private Button openTexButton;
     private Label texFileLabel;
     private Button renderPdfButton;
+
+    @BeforeAll
+    public static void setupForHeadlessTesting() {
+        HeadlessHelper.setupForHeadlessTesting();
+    }
 
     @BeforeEach
     public void setup() throws Exception {
