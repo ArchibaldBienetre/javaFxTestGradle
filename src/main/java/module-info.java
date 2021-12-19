@@ -5,6 +5,9 @@ module com.example.javafxtest {
 
     requires com.google.common;
 
+    // ! Do not commit this commented-in: It causes issues with integration tests for some reason
+    // requires jsr305;
+
     opens com.example.javafxtest;
     exports com.example.javafxtest;
 }
