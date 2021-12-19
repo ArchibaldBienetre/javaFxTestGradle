@@ -15,6 +15,9 @@ import net.raumzeitfalle.fx.filechooser.locations.Locations;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +38,7 @@ public class FileChooserController {
     @FXML
     public void onOpenTexButtonClick(ActionEvent ignored) {
         FXFileChooserDialog texChooser = getTexChooser();
-        Optional<Path> selectedFile = texChooser.showOpenDialog(getWindow());
+        Optional<Path> selectedFile = getSelectedFile(texChooser);
         updateTexFile(selectedFile);
     }
 
@@ -55,7 +58,7 @@ public class FileChooserController {
     @FXML
     public void onOpenCsvButtonClick(ActionEvent ignored) {
         FXFileChooserDialog csvChooser = getCsvChooser();
-        Optional<Path> selectedFile = csvChooser.showOpenDialog(getWindow());
+        Optional<Path> selectedFile = getSelectedFile(csvChooser);
         updateCsvFile(selectedFile);
     }
 
@@ -77,6 +80,25 @@ public class FileChooserController {
                 Locations.at(Path.of("./src/integrationTest/resources"))
         ));
         return chooser;
+    }
+
+    private Optional<Path> getSelectedFile(FXFileChooserDialog fileChooser) {
+        Optional<Path> selectedFile = fileChooser.showOpenDialog(getWindow());
+        if (selectedFile.isEmpty()) {
+            // workaround for bug https://github.com/Oliver-Loeffler/FXFileChooser/issues/44
+            try {
+                Field modelField = FXFileChooserDialog.class.getDeclaredField("model");
+                modelField.setAccessible(true);
+                Object model = modelField.get(fileChooser);
+                Method getSelectedFileMethod = model.getClass().getDeclaredMethod("getSelectedFile");
+                getSelectedFileMethod.setAccessible(true);
+                Path result = (Path) getSelectedFileMethod.invoke(model);
+                return Optional.ofNullable(result);
+            } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return selectedFile;
     }
 
     @VisibleForTesting
