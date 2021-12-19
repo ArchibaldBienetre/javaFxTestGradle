@@ -28,10 +28,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.testfx.assertions.api.Assertions.assertThat;
 
 @ExtendWith(ApplicationExtension.class)
 public class FileChooserApplicationTest {
+
+    private static final String DUMMY_CSV_FILE_NAME = "dummyCsv.csv";
+    private static final String DUMMY_TEX_FILE_NAME = "dummyTex.tex";
 
     private Button openCsvButton;
     private Label csvFileLabel;
@@ -56,15 +60,15 @@ public class FileChooserApplicationTest {
     private void putDummyFilesIntoUserHome() throws IOException {
         Path userHome = Paths.get(System.getProperty("user.home"));
 
-        File dummyCsv = getDummyFileFromClasspath("dummyCsv.csv");
-        Path targetCsv = userHome.resolve("dummyCsv.csv");
-        if (! targetCsv.toFile().exists()) {
+        File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
+        Path targetCsv = userHome.resolve(DUMMY_CSV_FILE_NAME);
+        if (!targetCsv.toFile().exists()) {
             Files.copy(dummyCsv.toPath(), targetCsv);
         }
 
-        File dummyTex = getDummyFileFromClasspath("dummyTex.tex");
-        Path targetTex = userHome.resolve("dummyTex.tex");
-        if (! targetTex.toFile().exists()) {
+        File dummyTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
+        Path targetTex = userHome.resolve(DUMMY_TEX_FILE_NAME);
+        if (!targetTex.toFile().exists()) {
             Files.copy(dummyTex.toPath(), targetTex);
         }
     }
@@ -87,11 +91,9 @@ public class FileChooserApplicationTest {
 
 
     @Test
-    void testFileSelection(FxRobot robot) throws InterruptedException {
+    void testFileSelection(FxRobot robot) {
         // arrange
         lookUpUiNodes(robot);
-        File dummyCsv = getDummyFileFromClasspath("dummyCsv.csv");
-        File dummyTex = getDummyFileFromClasspath("dummyTex.tex");
 
         // act
         robot.clickOn(openCsvButton);
@@ -99,8 +101,8 @@ public class FileChooserApplicationTest {
 
         // assert
         assertThat(openCsvButton).hasText("Pick a CSV file!");
-        assertThat(csvFileLabel).hasText(dummyCsv.getAbsolutePath());
-        assertThat(csvFileLabel.getTooltip().getText()).isEqualTo(dummyCsv.getAbsolutePath());
+        assertThat(csvFileLabel).hasText(containsString(DUMMY_CSV_FILE_NAME));
+        assertThat(csvFileLabel.getTooltip().getText()).contains(DUMMY_CSV_FILE_NAME);
     }
 
     @Test
@@ -111,7 +113,7 @@ public class FileChooserApplicationTest {
 
         // FIXME inject these into the controller
         File nonExistentCsv = new File("nonexistent.csv");
-        File dummyTex = getDummyFileFromClasspath("dummyTex.tex");
+        File dummyTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
 
         // act
         robot.clickOn(renderPdfButton);
@@ -135,7 +137,7 @@ public class FileChooserApplicationTest {
         lookUpUiNodes(robot);
 
         // FIXME inject these into the controller
-        File dummyCsv = getDummyFileFromClasspath("dummyCsv.csv");
+        File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
         File nonexistentTex = new File("nonexistent.tex");
 
         // act
@@ -160,8 +162,8 @@ public class FileChooserApplicationTest {
         lookUpUiNodes(robot);
 
         // FIXME inject these into the controller
-        File dummyCsv = getDummyFileFromClasspath("dummyCsv.csv");
-        File nonexistentTex = getDummyFileFromClasspath("dummyTex.tex");
+        File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
+        File nonexistentTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
 
         // act
         robot.clickOn(renderPdfButton);
