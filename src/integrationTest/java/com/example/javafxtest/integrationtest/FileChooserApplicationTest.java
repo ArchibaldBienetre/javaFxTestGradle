@@ -210,7 +210,10 @@ public class FileChooserApplicationTest {
 
         chooseCsvInListOfFiles(robot);
 
-        // for some reason, I can't even click "OK"
+        // The test framework cannot click the OK button - its bounds are not explicitly defined,
+        // but implicit in the context of the surrounding HBox.
+        // While I could "hack" an absolute-position click, double click in the list of files as a workaround
+        // is more reliable.
         // pressOkButton(robot);
     }
 
@@ -225,6 +228,7 @@ public class FileChooserApplicationTest {
         robot.doubleClickOn(MouseButton.PRIMARY);
     }
 
+    // unused, see comment in selectFirstMatchingFileInUserHome
     private void pressOkButton(FxRobot robot) {
         Set<Node> allOkButtons = robot.lookup("#okButton").queryAll();
         assertThat(allOkButtons).hasSize(1);
