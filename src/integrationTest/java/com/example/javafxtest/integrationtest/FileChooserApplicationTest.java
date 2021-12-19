@@ -21,6 +21,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.ApplicationTest;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -34,6 +35,7 @@ import static org.testfx.assertions.api.Assertions.assertThat;
 @ExtendWith(ApplicationExtension.class)
 public class FileChooserApplicationTest {
 
+    private static final String RESOURCES_DIR_RELATIVE_PATH = "./src/integrationTest/resources/";
     private static final String DUMMY_CSV_FILE_NAME = "dummyCsv.csv";
     private static final String DUMMY_TEX_FILE_NAME = "dummyTex.tex";
 
@@ -60,16 +62,20 @@ public class FileChooserApplicationTest {
     private void putDummyFilesIntoUserHome() throws IOException {
         Path userHome = Paths.get(System.getProperty("user.home"));
 
-        File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
+        File dummyCsv = new File(RESOURCES_DIR_RELATIVE_PATH + DUMMY_CSV_FILE_NAME);
         Path targetCsv = userHome.resolve(DUMMY_CSV_FILE_NAME);
         if (!targetCsv.toFile().exists()) {
-            Files.copy(dummyCsv.toPath(), targetCsv);
+            try(FileInputStream input = new FileInputStream(dummyCsv)) {
+                Files.copy(input, targetCsv);
+            }
         }
 
-        File dummyTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
+        File dummyTex = new File(RESOURCES_DIR_RELATIVE_PATH + DUMMY_TEX_FILE_NAME);
         Path targetTex = userHome.resolve(DUMMY_TEX_FILE_NAME);
         if (!targetTex.toFile().exists()) {
-            Files.copy(dummyTex.toPath(), targetTex);
+            try(FileInputStream input = new FileInputStream(dummyTex)) {
+                Files.copy(input, targetTex);
+            }
         }
     }
 
@@ -113,7 +119,7 @@ public class FileChooserApplicationTest {
 
         // FIXME inject these into the controller
         File nonExistentCsv = new File("nonexistent.csv");
-        File dummyTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
+        // File dummyTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
 
         // act
         robot.clickOn(renderPdfButton);
@@ -137,8 +143,8 @@ public class FileChooserApplicationTest {
         lookUpUiNodes(robot);
 
         // FIXME inject these into the controller
-        File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
-        File nonexistentTex = new File("nonexistent.tex");
+        // File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
+        // File nonexistentTex = new File("nonexistent.tex");
 
         // act
         robot.clickOn(renderPdfButton);
@@ -162,8 +168,8 @@ public class FileChooserApplicationTest {
         lookUpUiNodes(robot);
 
         // FIXME inject these into the controller
-        File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
-        File nonexistentTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
+        // File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
+        // File nonexistentTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
 
         // act
         robot.clickOn(renderPdfButton);
@@ -180,14 +186,6 @@ public class FileChooserApplicationTest {
         openTexButton = robot.lookup("#openTexButton").queryButton();
         texFileLabel = robot.lookup("#texFileLabel").queryAs(Label.class);
         renderPdfButton = robot.lookup("#renderPdfButton").queryButton();
-    }
-
-    private File getDummyFileFromClasspath(String fileName) {
-        URL resource = getClass().getClassLoader().getResource(fileName);
-        Assertions.assertThat(resource)
-                .describedAs("file not found in classpath: " + fileName)
-                .isNotNull();
-        return new File(resource.getFile());
     }
 
     /**
