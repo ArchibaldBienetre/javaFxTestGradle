@@ -63,7 +63,7 @@ public class FileChooserApplicationTest {
         File dummyCsv = new File(RESOURCES_DIR_RELATIVE_PATH + DUMMY_CSV_FILE_NAME);
         Path targetCsv = userHome.resolve(DUMMY_CSV_FILE_NAME);
         if (!targetCsv.toFile().exists()) {
-            try(FileInputStream input = new FileInputStream(dummyCsv)) {
+            try (FileInputStream input = new FileInputStream(dummyCsv)) {
                 Files.copy(input, targetCsv);
             }
         }
@@ -71,7 +71,7 @@ public class FileChooserApplicationTest {
         File dummyTex = new File(RESOURCES_DIR_RELATIVE_PATH + DUMMY_TEX_FILE_NAME);
         Path targetTex = userHome.resolve(DUMMY_TEX_FILE_NAME);
         if (!targetTex.toFile().exists()) {
-            try(FileInputStream input = new FileInputStream(dummyTex)) {
+            try (FileInputStream input = new FileInputStream(dummyTex)) {
                 Files.copy(input, targetTex);
             }
         }
@@ -208,11 +208,7 @@ public class FileChooserApplicationTest {
 
         chooseCsvInListOfFiles(robot);
 
-        // The test framework cannot click the OK button - its bounds are not explicitly defined,
-        // but implicit in the context of the surrounding HBox.
-        // While I could "hack" an absolute-position click, double click in the list of files as a workaround
-        // is more reliable.
-        // pressOkButton(robot);
+        pressOkButton(robot);
     }
 
     private void chooseCsvInListOfFiles(FxRobot robot) {
@@ -223,23 +219,14 @@ public class FileChooserApplicationTest {
 //        robot.clickOn(listOfFiles);
 
         moveMouseToUpperLeftPlusOffset(robot, listOfFiles, 15);
-        robot.doubleClickOn(MouseButton.PRIMARY);
+        robot.clickOn(MouseButton.PRIMARY);
     }
 
-    // unused, see comment in selectFirstMatchingFileInUserHome
     private void pressOkButton(FxRobot robot) {
         Set<Node> allOkButtons = robot.lookup("#okButton").queryAll();
         assertThat(allOkButtons).hasSize(1);
         Node okButton = allOkButtons.iterator().next();
         assertThat(okButton).isEnabled();
-
-        // neither of these move the mouse to the actual button's position
-        robot.moveTo(okButton);
-        moveMouseToUpperLeftPlusOffset(robot, okButton, 10);
-
-        robot.clickOn(MouseButton.PRIMARY);
-
-        // does not work, either
         robot.clickOn(okButton);
     }
 
