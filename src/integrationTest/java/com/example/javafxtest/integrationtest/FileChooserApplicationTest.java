@@ -222,13 +222,7 @@ public class FileChooserApplicationTest {
 //        listOfFiles.refresh();
 //        robot.clickOn(listOfFiles);
 
-        Point2D fileListPoint = listOfFiles.localToScene(0, 0);
-        Scene scene = listOfFiles.getScene();
-        Window window = scene.getWindow();
-        robot.moveTo(new Point2D(
-                fileListPoint.getX() + scene.getX() + window.getX() + 15,
-                fileListPoint.getY() + scene.getY() + window.getY() + 15
-        ));
+        moveMouseToUpperLeftPlusOffset(robot, listOfFiles, 15);
         robot.clickOn(MouseButton.PRIMARY);
     }
 
@@ -239,6 +233,16 @@ public class FileChooserApplicationTest {
         assertThat(okButton).isEnabled();
         robot.moveTo(okButton);
         robot.clickOn(MouseButton.PRIMARY);
+    }
+
+    private void moveMouseToUpperLeftPlusOffset(FxRobot robot, Node node, int offset) {
+        Point2D nodeUpperLeft = node.localToScene(0, 0);
+        Scene scene = node.getScene();
+        Window window = scene.getWindow();
+        robot.moveTo(new Point2D(
+                nodeUpperLeft.getX() + scene.getX() + window.getX() + offset,
+                nodeUpperLeft.getY() + scene.getY() + window.getY() + offset
+        ));
     }
 }
 
