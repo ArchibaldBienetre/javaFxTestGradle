@@ -26,6 +26,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 
 import static org.testfx.assertions.api.Assertions.assertThat;
 
@@ -230,9 +231,12 @@ public class FileChooserApplicationTest {
     }
 
     private void pressOkButton(FxRobot robot) {
-        Button okButton = robot.lookup("#okButton").queryButton();
+        Set<Node> allOkButtons = robot.lookup("#okButton").queryAll();
+        assertThat(allOkButtons).hasSize(1);
+        Node okButton = allOkButtons.iterator().next();
         assertThat(okButton).isEnabled();
-        robot.clickOn(okButton);
+        robot.moveTo(okButton);
+        robot.clickOn(MouseButton.PRIMARY);
     }
 }
 
