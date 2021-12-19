@@ -66,6 +66,8 @@ dependencies {
     implementation("org.openjfx:javafx-fxml:${javaFxVersion}")
     implementation("org.openjfx:javafx-graphics:${javaFxVersion}")
 
+    implementation("net.raumzeitfalle.fx:filechooser:0.0.6")
+
     // for @Nullable etc
     implementation("com.google.code.findbugs:jsr305:3.0.2")
 

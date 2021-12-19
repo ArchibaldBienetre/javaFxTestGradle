@@ -7,11 +7,17 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import net.raumzeitfalle.fx.filechooser.FXFileChooserDialog;
+import net.raumzeitfalle.fx.filechooser.PathFilter;
+import net.raumzeitfalle.fx.filechooser.Skin;
+import net.raumzeitfalle.fx.filechooser.locations.Locations;
 
-import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 
 public class FileChooserController {
 
@@ -28,51 +34,58 @@ public class FileChooserController {
 
     @FXML
     public void onOpenTexButtonClick(ActionEvent ignored) {
-        File tempTexFile = getTexChooser().showOpenDialog(getWindow());
-        updateTexFile(tempTexFile);
-
+        FXFileChooserDialog texChooser = getTexChooser();
+        Optional<Path> selectedFile = texChooser.showOpenDialog(getWindow());
+        updateTexFile(selectedFile);
     }
 
-    private FileChooser getTexChooser() {
-        FileChooser texChooser = new FileChooser();
-        texChooser.setTitle("Pick a TeX file");
-        FileChooser.ExtensionFilter texFilter = new FileChooser.ExtensionFilter("TeX files", "*.tex");
-        texChooser.getExtensionFilters().add(texFilter);
-        texChooser.setSelectedExtensionFilter(texFilter);
-        return texChooser;
+    private FXFileChooserDialog getTexChooser() {
+        return getFileChooser("TeX file", "tex", "Pick a TeX file");
     }
 
     @VisibleForTesting
-    void updateTexFile(@Nullable File tempTexFile) {
-        if (tempTexFile != null) {
-            texFile = tempTexFile;
+    void updateTexFile(Optional<Path> tempTexFilePath) {
+        tempTexFilePath.ifPresent(path -> {
+            texFile = path.toFile();
             texFileLabel.setText(texFile.getAbsolutePath());
             texFileLabel.setTooltip(new Tooltip(texFile.getAbsolutePath()));
-        }
+        });
     }
 
     @FXML
     public void onOpenCsvButtonClick(ActionEvent ignored) {
-        File tempCsvFile = getCsvChooser().showOpenDialog(getWindow());
-        updateCsvFile(tempCsvFile);
+        FXFileChooserDialog csvChooser = getCsvChooser();
+        Optional<Path> selectedFile = csvChooser.showOpenDialog(getWindow());
+        updateCsvFile(selectedFile);
     }
 
-    private FileChooser getCsvChooser() {
-        FileChooser csvChooser = new FileChooser();
-        csvChooser.setTitle("Pick a CSV file");
-        FileChooser.ExtensionFilter csvFilter = new FileChooser.ExtensionFilter("CSV files", "*.csv");
-        csvChooser.getExtensionFilters().add(csvFilter);
-        csvChooser.setSelectedExtensionFilter(csvFilter);
-        return csvChooser;
+    private FXFileChooserDialog getCsvChooser() {
+        return getFileChooser("CSV file", "csv", "Pick a CSV file");
+    }
+
+    private FXFileChooserDialog getFileChooser(String filterLabel, String fileExtension, String dialogTitle) {
+        PathFilter filter = PathFilter.forFileExtension(filterLabel, fileExtension);
+        FXFileChooserDialog chooser;
+        try {
+            chooser = FXFileChooserDialog.create(Skin.DEFAULT, filter);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        chooser.setTitle(dialogTitle);
+        chooser.addLocations(List.of(
+                Locations.at(Path.of(".")),
+                Locations.at(Path.of("./src/integrationTest/resources"))
+        ));
+        return chooser;
     }
 
     @VisibleForTesting
-    void updateCsvFile(@Nullable File newCsvFile) {
-        if (newCsvFile != null) {
-            csvFile = newCsvFile;
+    void updateCsvFile(Optional<Path> tempCsvFilePath) {
+        tempCsvFilePath.ifPresent(path -> {
+            csvFile = path.toFile();
             csvFileLabel.setText(csvFile.getAbsolutePath());
             csvFileLabel.setTooltip(new Tooltip(csvFile.getAbsolutePath()));
-        }
+        });
     }
 
     @FXML
