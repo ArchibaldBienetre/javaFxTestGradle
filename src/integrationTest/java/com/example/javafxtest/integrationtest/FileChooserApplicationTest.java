@@ -10,9 +10,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Window;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
@@ -77,6 +78,15 @@ public class FileChooserApplicationTest {
         }
     }
 
+    @AfterEach
+    public void closeAllAlertWindows(FxRobot robot) {
+        Set<Button> buttons = robot.lookup(".button").queryAllAs(Button.class);
+        Optional<Button> okButton = buttons.stream()
+                .filter(b -> "OK".equals(b.getText()))
+                .findFirst();
+        okButton.ifPresent(robot::clickOn);
+    }
+
     /**
      * @param robot - Will be injected by the test runner.
      */
@@ -95,7 +105,7 @@ public class FileChooserApplicationTest {
 
 
     @Test
-    void testFileSelection(FxRobot robot) {
+    public void testCsvFileSelection(FxRobot robot) {
         // arrange
         lookUpUiNodes(robot);
 
@@ -110,14 +120,28 @@ public class FileChooserApplicationTest {
     }
 
     @Test
-    @Disabled("not yet fully implemented")
-    void onRenderPdfButtonClick_onMissingCsv_showsAlert(FxRobot robot) {
+    public void testTexFileSelection(FxRobot robot) {
         // arrange
         lookUpUiNodes(robot);
 
-        // FIXME inject these into the controller
-        File nonExistentCsv = new File("nonexistent.csv");
-        // File dummyTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
+        // act
+        robot.clickOn(openTexButton);
+        selectFirstMatchingFileInUserHome(robot);
+
+        // assert
+        assertThat(openTexButton).hasText("Pick a TEX file!");
+        assertThat(texFileLabel).hasText(containsString(DUMMY_TEX_FILE_NAME));
+        assertThat(texFileLabel.getTooltip().getText()).contains(DUMMY_TEX_FILE_NAME);
+    }
+
+    @Test
+    public void onRenderPdfButtonClick_onMissingCsv_showsAlert(FxRobot robot) {
+        // arrange
+        lookUpUiNodes(robot);
+        robot.clickOn(openTexButton);
+        // no CSV selected
+        selectFirstMatchingFileInUserHome(robot);
+
 
         // act
         robot.clickOn(renderPdfButton);
@@ -125,24 +149,19 @@ public class FileChooserApplicationTest {
         // assert
         // lookup Alert (it's a dialog), then do assertions
         // https://stackoverflow.com/a/59152238/1143126
-        Node dialogPaneNode = robot.lookup(".dialog-pane").query();
-        assertThat(dialogPaneNode).isNotNull();
-        assertThat(dialogPaneNode).isInstanceOf(DialogPane.class);
-        DialogPane dialogPane = (DialogPane) dialogPaneNode;
+        DialogPane dialogPane = assertAndLookUpAlert(robot);
         assertThat(dialogPane.getHeaderText()).isEqualTo("Error");
         assertThat(dialogPane.getContentText()).contains("does not exist");
         assertThat(dialogPane.getContentText()).contains("CSV");
     }
 
     @Test
-    @Disabled("not yet fully implemented")
-    void onRenderPdfButtonClick_onMissingTex_showsAlert(FxRobot robot) {
+    public void onRenderPdfButtonClick_onMissingTex_showsAlert(FxRobot robot) {
         // arrange
         lookUpUiNodes(robot);
-
-        // FIXME inject these into the controller
-        // File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
-        // File nonexistentTex = new File("nonexistent.tex");
+        // no TEX selected
+        robot.clickOn(openCsvButton);
+        selectFirstMatchingFileInUserHome(robot);
 
         // act
         robot.clickOn(renderPdfButton);
@@ -150,32 +169,29 @@ public class FileChooserApplicationTest {
         // assert
         // lookup Alert (it's a dialog), then do assertions
         // https://stackoverflow.com/a/59152238/1143126
-        Node dialogPaneNode = robot.lookup(".dialog-pane").query();
-        assertThat(dialogPaneNode).isNotNull();
-        assertThat(dialogPaneNode).isInstanceOf(DialogPane.class);
-        DialogPane dialogPane = (DialogPane) dialogPaneNode;
+        DialogPane dialogPane = assertAndLookUpAlert(robot);
         assertThat(dialogPane.getHeaderText()).isEqualTo("Error");
         assertThat(dialogPane.getContentText()).contains("does not exist");
         assertThat(dialogPane.getContentText()).contains("TEX");
     }
 
     @Test
-    @Disabled("not yet fully implemented")
-    void onRenderPdfButtonClick_withValidFiles_showsNoError(FxRobot robot) {
+    public void onRenderPdfButtonClick_withValidFiles_showsNoError(FxRobot robot) {
         // arrange
         lookUpUiNodes(robot);
-
-        // FIXME inject these into the controller
-        // File dummyCsv = getDummyFileFromClasspath(DUMMY_CSV_FILE_NAME);
-        // File nonexistentTex = getDummyFileFromClasspath(DUMMY_TEX_FILE_NAME);
+        robot.clickOn(openCsvButton);
+        selectFirstMatchingFileInUserHome(robot);
+        robot.clickOn(openTexButton);
+        selectFirstMatchingFileInUserHome(robot);
 
         // act
         robot.clickOn(renderPdfButton);
 
         // assert
-        // no Alert dialog shown
-        Node dialogPaneNode = robot.lookup(".dialog-pane").query();
-        assertThat(dialogPaneNode).isNull();
+        DialogPane dialogPane = assertAndLookUpAlert(robot);
+        assertThat(dialogPane.getHeaderText())
+                .describedAs("no alert dialog should be shown")
+                .isEqualTo("Success");
     }
 
     private void lookUpUiNodes(FxRobot robot) {
@@ -206,12 +222,12 @@ public class FileChooserApplicationTest {
 //        List<MenuItem> items = chooseDirectory.getItems();
 //        MenuItem lastItem = chooseDirectory.getItems().get(items.size() - 1);
 
-        chooseCsvInListOfFiles(robot);
+        chooseFirstInListOfFiles(robot);
 
         pressOkButton(robot);
     }
 
-    private void chooseCsvInListOfFiles(FxRobot robot) {
+    private void chooseFirstInListOfFiles(FxRobot robot) {
         ListView<?> listOfFiles = robot.lookup("#listOfFiles").queryListView();
         // I cannot do this programmatically, it seems
 //        listOfFiles.getSelectionModel().selectFirst();
@@ -238,6 +254,15 @@ public class FileChooserApplicationTest {
                 nodeUpperLeft.getX() + scene.getX() + window.getX() + offset,
                 nodeUpperLeft.getY() + scene.getY() + window.getY() + offset
         ));
+    }
+
+    private DialogPane assertAndLookUpAlert(FxRobot robot) {
+        Node dialogPaneNode = robot.lookup(".dialog-pane").query();
+        assertThat(dialogPaneNode)
+                .describedAs("an alert message should be shown")
+                .isNotNull()
+                .isInstanceOf(DialogPane.class);
+        return (DialogPane) dialogPaneNode;
     }
 }
 
