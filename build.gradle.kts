@@ -29,7 +29,8 @@ val integrationTestTask = tasks.register<Test>("integrationTest") {
     jvmArgs = listOf("--add-exports", "javafx.graphics/com.sun.javafx.application=org.testfx",
             "--add-exports", "javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
             "--add-opens", "javafx.graphics/com.sun.glass.ui=org.testfx",
-            "--add-exports", "javafx.graphics/com.sun.glass.ui=org.testfx.monocle"
+            "--add-exports", "javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
+            "--add-reads", "com.example.javafxtest=ALL-UNNAMED"
     )
 
     testClassesDirs = integrationTest.output.classesDirs
@@ -50,7 +51,8 @@ java {
 
 application {
     mainModule.set("com.example.javafxtest")
-    mainClass.set("com.example.javafxtest.HelloApplication")
+    // mainClass.set("com.example.javafxtest.HelloApplication")
+    mainClass.set("com.example.javafxtest.FileChooserApplication")
 }
 
 val javaFxVersion = "18-ea+8"
@@ -64,6 +66,14 @@ dependencies {
     implementation("org.openjfx:javafx-controls:${javaFxVersion}")
     implementation("org.openjfx:javafx-fxml:${javaFxVersion}")
     implementation("org.openjfx:javafx-graphics:${javaFxVersion}")
+
+    implementation("net.raumzeitfalle.fx:filechooser:0.0.6")
+
+    // for @Nullable etc
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
+
+    // for @VisibleForTesting etc
+    implementation("com.google.guava:guava:31.0.1-jre")
 
     var junitVersion = "5.8.2"
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
