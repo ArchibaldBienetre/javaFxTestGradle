@@ -73,7 +73,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
     // module required by junit, it seems
-    testImplementation("org.apiguardian:apiguardian-api:1.0.0")
+    testImplementation("org.apiguardian:apiguardian-api:1.1.2")
 
 
     var testFxVersion = "4.0.16-alpha"
