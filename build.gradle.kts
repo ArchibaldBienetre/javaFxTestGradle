@@ -26,12 +26,6 @@ val integrationTestTask = tasks.register<Test>("integrationTest") {
     description = "Runs integration tests."
     group = "verification"
     useJUnitPlatform()
-    jvmArgs = listOf("--add-exports", "javafx.graphics/com.sun.javafx.application=org.testfx",
-            "--add-exports", "javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
-            "--add-opens", "javafx.graphics/com.sun.glass.ui=org.testfx",
-            "--add-exports", "javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
-            "--add-reads", "com.example.javafxtest=ALL-UNNAMED"
-    )
 
     testClassesDirs = integrationTest.output.classesDirs
     // Make sure we run the 'Jar' containing the tests (and not just the 'classes' folder) so that test resources are also part of the test module
